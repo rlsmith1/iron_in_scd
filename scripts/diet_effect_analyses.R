@@ -36,6 +36,29 @@
 #### Models   
 
     
+# overall plot 
+    
+    # plot
+    cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
+    
+    df_mice %>% 
+      dplyr::select(-c(hepatic.necrosis..yes.no., iron.deposition.score..0.4...spleen., iron.deposition.score..0.4...liver., iron.deposition.score..0.4..kidney.)) %>% 
+      pivot_longer(cols = 5:ncol(.), names_to = "variable", values_to = "value") %>% 
+      
+      ggplot(aes(x = treatment, y = value)) +
+      geom_violin(aes(color = treatment)) +
+      facet_grid(variable ~ timepoint..month., scales = "free_y") +
+      # geom_boxplot(aes(color = treatment), width = .3, position = position_dodge(0.9), outlier.shape = NA, alpha = 0.1) +
+      stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint..month.), position = position_dodge(), size = .3, lty = 2) +
+      
+      geom_sina(aes(fill = timepoint..month., color = sex), size = 2.5, shape = 1) +
+      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .2) +
+      
+      scale_color_manual(values = cols) +
+      theme_bw() +
+      theme(legend.position = "none")
+    
+    
 
 # ferritin ----------------------------------------------------------------
 
@@ -55,22 +78,24 @@
     # model
     aov_ferritin <- aov(Ferritin..ng.ml. ~ timepoint..month.*treatment*sex, data = df_mice)
     aov_ferritin %>% tidy()
-    aov_ferritin %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05)
+    aov_ferritin %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05) %>% print(n = nrow(.))
     
     # plot
-    cols <- c("2" = "#D2D2D2", "4" = "#828282", "6" = "#3C3C3C", "M" = "#0072B2", "F" = "#CC79A7")
+    cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
     
     df_mice %>% 
       ggplot(aes(x = treatment, y = Ferritin..ng.ml.)) +
-      geom_violin(aes(color = timepoint..month.)) +
+      geom_violin(aes(color = treatment)) +
+      facet_wrap(~timepoint..month.) +
       # geom_boxplot(aes(color = treatment), width = .3, position = position_dodge(0.9), outlier.shape = NA, alpha = 0.1) +
       stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint..month.), position = position_dodge(), size = .3, lty = 2) +
       
       geom_sina(aes(fill = timepoint..month., color = sex), size = 2.5, shape = 1) +
-      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .3) +
-
+      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .2) +
+      
       scale_color_manual(values = cols) +
-      theme_bw()
+      theme_bw() +
+      theme(legend.position = "none")
     
     # conclusions:
     #   treatment effect
@@ -82,22 +107,24 @@
     # model
     aov_hamp1 <- aov(HAMP1..cDNA.ng. ~ timepoint..month.*treatment*sex, data = df_mice)
     aov_hamp1 %>% tidy()
-    aov_hamp1 %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05)
+    aov_hamp1 %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05) %>% print(n = nrow(.))
     
     # plot
-    cols <- c("2" = "#D2D2D2", "4" = "#828282", "6" = "#3C3C3C", "M" = "#0072B2", "F" = "#CC79A7")
+    cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
     
     df_mice %>% 
       ggplot(aes(x = treatment, y = HAMP1..cDNA.ng.)) +
-      geom_violin(aes(color = timepoint..month.)) +
+      geom_violin(aes(color = treatment)) +
+      facet_wrap(~timepoint..month.) +
       # geom_boxplot(aes(color = treatment), width = .3, position = position_dodge(0.9), outlier.shape = NA, alpha = 0.1) +
       stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint..month.), position = position_dodge(), size = .3, lty = 2) +
       
       geom_sina(aes(fill = timepoint..month., color = sex), size = 2.5, shape = 1) +
-      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .3) +
+      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .2) +
       
       scale_color_manual(values = cols) +
-      theme_bw()
+      theme_bw() +
+      theme(legend.position = "none")
     
     # conclusions:
     #   treatment effect (across all three timepoints, sufficient different than deficient)
@@ -113,22 +140,24 @@
     
     aov_hepcidin <- aov(Hepcidin..ng.ml. ~ timepoint..month.*treatment*sex, data = df_mice)
     aov_hepcidin %>% tidy()
-    aov_hepcidin %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05)
+    aov_hepcidin %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05) %>% print(n = nrow(.))
     
     # plot
-    cols <- c("2" = "#D2D2D2", "4" = "#828282", "6" = "#3C3C3C", "M" = "#0072B2", "F" = "#CC79A7")
+    cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
     
     df_mice %>% 
       ggplot(aes(x = treatment, y = Hepcidin..ng.ml.)) +
-      geom_violin(aes(color = timepoint..month.)) +
+      geom_violin(aes(color = treatment)) +
+      facet_wrap(~timepoint..month.) +
       # geom_boxplot(aes(color = treatment), width = .3, position = position_dodge(0.9), outlier.shape = NA, alpha = 0.1) +
       stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint..month.), position = position_dodge(), size = .3, lty = 2) +
       
       geom_sina(aes(fill = timepoint..month., color = sex), size = 2.5, shape = 1) +
-      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .3) +
+      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .2) +
       
       scale_color_manual(values = cols) +
-      theme_bw()
+      theme_bw() +
+      theme(legend.position = "none")
     
     # conclusions:
     #   treatment effect
@@ -150,22 +179,24 @@
 
     aov_plasma_heme <- aov(Plasma.Heme..µM. ~ timepoint..month.*treatment*sex, data = df_mice)
     aov_plasma_heme %>% tidy()
-    aov_plasma_heme %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05) %>% View()
+    aov_plasma_heme %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05) %>% print(n = nrow(.))
     
     # plot
-    cols <- c("2" = "#D2D2D2", "4" = "#828282", "6" = "#3C3C3C", "M" = "#0072B2", "F" = "#CC79A7")
+    cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
     
     df_mice %>% 
       ggplot(aes(x = treatment, y = Plasma.Heme..µM.)) +
-      geom_violin(aes(color = timepoint..month.)) +
+      geom_violin(aes(color = treatment)) +
+      facet_wrap(~timepoint..month.) +
       # geom_boxplot(aes(color = treatment), width = .3, position = position_dodge(0.9), outlier.shape = NA, alpha = 0.1) +
       stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint..month.), position = position_dodge(), size = .3, lty = 2) +
       
       geom_sina(aes(fill = timepoint..month., color = sex), size = 2.5, shape = 1) +
-      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .3) +
+      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .2) +
       
       scale_color_manual(values = cols) +
-      theme_bw()
+      theme_bw() +
+      theme(legend.position = "none")
     
     # conclusions:
     #   timepoint effect (4 diff from 2, 6 diff from 2; esp in deficient)
@@ -185,19 +216,21 @@
     aov_haptoglobin %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05)
     
     # plot
-    cols <- c("2" = "#D2D2D2", "4" = "#828282", "6" = "#3C3C3C", "M" = "#0072B2", "F" = "#CC79A7")
+    cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
     
     df_mice %>% 
       ggplot(aes(x = treatment, y = Haptoglobin..ng.ml.)) +
-      geom_violin(aes(color = timepoint..month.)) +
+      geom_violin(aes(color = treatment)) +
+      facet_wrap(~timepoint..month.) +
       # geom_boxplot(aes(color = treatment), width = .3, position = position_dodge(0.9), outlier.shape = NA, alpha = 0.1) +
       stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint..month.), position = position_dodge(), size = .3, lty = 2) +
       
       geom_sina(aes(fill = timepoint..month., color = sex), size = 2.5, shape = 1) +
-      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .3) +
+      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .2) +
       
       scale_color_manual(values = cols) +
-      theme_bw()
+      theme_bw() +
+      theme(legend.position = "none")
     
     # conclusions:
     #   sex effect
@@ -212,22 +245,24 @@
 
     aov_hemopexin <- aov(Hemopexin..ng.ml. ~ timepoint..month.*treatment*sex, data = df_mice)
     aov_hemopexin %>% tidy()
-    aov_hemopexin %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05)
+    aov_hemopexin %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05) %>% print(n = nrow(.))
     
     # plot
-    cols <- c("2" = "#D2D2D2", "4" = "#828282", "6" = "#3C3C3C", "M" = "#0072B2", "F" = "#CC79A7")
+    cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
     
     df_mice %>% 
       ggplot(aes(x = treatment, y = Hemopexin..ng.ml.)) +
-      geom_violin(aes(color = timepoint..month.)) +
+      geom_violin(aes(color = treatment)) +
+      facet_wrap(~timepoint..month.) +
       # geom_boxplot(aes(color = treatment), width = .3, position = position_dodge(0.9), outlier.shape = NA, alpha = 0.1) +
       stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint..month.), position = position_dodge(), size = .3, lty = 2) +
       
       geom_sina(aes(fill = timepoint..month., color = sex), size = 2.5, shape = 1) +
-      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .3) +
+      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .2) +
       
       scale_color_manual(values = cols) +
-      theme_bw()
+      theme_bw() +
+      theme(legend.position = "none")
     
     # conclusions:
     #   timepoint effect (4 different from 2)
@@ -246,19 +281,20 @@
     aov_p50 %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05)
     
     # plot
-    cols <- c("2" = "#D2D2D2", "4" = "#828282", "6" = "#3C3C3C", "M" = "#0072B2", "F" = "#CC79A7")
+    cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
     
     df_mice %>% 
       ggplot(aes(x = treatment, y = P50..mm.Hg.)) +
-      geom_violin(aes(color = timepoint..month.)) +
+      geom_violin(aes(color = treatment)) +
       # geom_boxplot(aes(color = treatment), width = .3, position = position_dodge(0.9), outlier.shape = NA, alpha = 0.1) +
       stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint..month.), position = position_dodge(), size = .3, lty = 2) +
       
       geom_sina(aes(fill = timepoint..month., color = sex), size = 2.5, shape = 1) +
-      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .3) +
+      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .2) +
       
       scale_color_manual(values = cols) +
-      theme_bw()
+      theme_bw() +
+      theme(legend.position = "none")
     
     # conclusions:
     #   treatment effect (4 different from 2)
@@ -270,22 +306,25 @@
   
     aov_round_cell <- aov(Round.cell.half.life..minutes. ~ timepoint..month.*treatment*sex, data = df_mice)
     aov_round_cell %>% tidy()
-    aov_round_cell %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05)
+    aov_round_cell %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05) %>% print(n = nrow(.))
     
     # plot
-    cols <- c("2" = "#D2D2D2", "4" = "#828282", "6" = "#3C3C3C", "M" = "#0072B2", "F" = "#CC79A7")
+    cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
     
     df_mice %>% 
       ggplot(aes(x = treatment, y = Round.cell.half.life..minutes.)) +
-      geom_violin(aes(color = timepoint..month.)) +
+      geom_violin(aes(color = treatment)) +
+      facet_wrap(~timepoint..month.) +
       # geom_boxplot(aes(color = treatment), width = .3, position = position_dodge(0.9), outlier.shape = NA, alpha = 0.1) +
       stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint..month.), position = position_dodge(), size = .3, lty = 2) +
       
       geom_sina(aes(fill = timepoint..month., color = sex), size = 2.5, shape = 1) +
-      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .3) +
+      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .2) +
       
       scale_color_manual(values = cols) +
-      theme_bw()
+      theme_bw() +
+      theme(legend.position = "none")
+    
     
     # conclusions:
     #   timepoint effect (2 & 6 different from 4)
@@ -303,19 +342,21 @@
     aov_rbc %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05)
     
     # plot
-    cols <- c("2" = "#D2D2D2", "4" = "#828282", "6" = "#3C3C3C", "M" = "#0072B2", "F" = "#CC79A7")
+    cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
     
     df_mice %>% 
       ggplot(aes(x = treatment, y = RBC..10.6.uL.)) +
-      geom_violin(aes(color = timepoint..month.)) +
+      geom_violin(aes(color = treatment)) +
+      facet_wrap(~timepoint..month.) +
       # geom_boxplot(aes(color = treatment), width = .3, position = position_dodge(0.9), outlier.shape = NA, alpha = 0.1) +
       stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint..month.), position = position_dodge(), size = .3, lty = 2) +
       
       geom_sina(aes(fill = timepoint..month., color = sex), size = 2.5, shape = 1) +
-      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .3) +
+      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .2) +
       
       scale_color_manual(values = cols) +
-      theme_bw()
+      theme_bw() +
+      theme(legend.position = "none")
     
     # conclusions:
     #   timepoint effect (6 different from 4)
@@ -331,19 +372,21 @@
     aov_hb %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05)
     
     # plot
-    cols <- c("2" = "#D2D2D2", "4" = "#828282", "6" = "#3C3C3C", "M" = "#0072B2", "F" = "#CC79A7")
+    cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
     
     df_mice %>% 
       ggplot(aes(x = treatment, y = Hb..g.dL.)) +
-      geom_violin(aes(color = timepoint..month.)) +
+      geom_violin(aes(color = treatment)) +
+      facet_wrap(~timepoint..month.) +
       # geom_boxplot(aes(color = treatment), width = .3, position = position_dodge(0.9), outlier.shape = NA, alpha = 0.1) +
       stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint..month.), position = position_dodge(), size = .3, lty = 2) +
       
       geom_sina(aes(fill = timepoint..month., color = sex), size = 2.5, shape = 1) +
-      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .3) +
+      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .2) +
       
       scale_color_manual(values = cols) +
-      theme_bw()
+      theme_bw() +
+      theme(legend.position = "none")
     
     # conclusions:
     #   timepoint effect (6 different from 4)
@@ -366,19 +409,21 @@
     aov_hct %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05)
     
     # plot
-    cols <- c("2" = "#D2D2D2", "4" = "#828282", "6" = "#3C3C3C", "M" = "#0072B2", "F" = "#CC79A7")
+    cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
     
     df_mice %>% 
       ggplot(aes(x = treatment, y = HCT....)) +
-      geom_violin(aes(color = timepoint..month.)) +
+      geom_violin(aes(color = treatment)) +
+      facet_wrap(~timepoint..month.) +
       # geom_boxplot(aes(color = treatment), width = .3, position = position_dodge(0.9), outlier.shape = NA, alpha = 0.1) +
       stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint..month.), position = position_dodge(), size = .3, lty = 2) +
       
       geom_sina(aes(fill = timepoint..month., color = sex), size = 2.5, shape = 1) +
-      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .3) +
+      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .2) +
       
       scale_color_manual(values = cols) +
-      theme_bw()
+      theme_bw() +
+      theme(legend.position = "none")
     
     # conclusions:
     #   timepoint effect (2 different from 4)
@@ -395,19 +440,21 @@
     aov_mcv %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05)
     
     # plot
-    cols <- c("2" = "#D2D2D2", "4" = "#828282", "6" = "#3C3C3C", "M" = "#0072B2", "F" = "#CC79A7")
+    cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
     
     df_mice %>% 
       ggplot(aes(x = treatment, y = MCV..fL.)) +
-      geom_violin(aes(color = timepoint..month.)) +
+      geom_violin(aes(color = treatment)) +
+      facet_wrap(~timepoint..month.) +
       # geom_boxplot(aes(color = treatment), width = .3, position = position_dodge(0.9), outlier.shape = NA, alpha = 0.1) +
       stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint..month.), position = position_dodge(), size = .3, lty = 2) +
       
       geom_sina(aes(fill = timepoint..month., color = sex), size = 2.5, shape = 1) +
-      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .3) +
+      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .2) +
       
       scale_color_manual(values = cols) +
-      theme_bw()
+      theme_bw() +
+      theme(legend.position = "none")
     
     # conclusions:
     #   timepoint effect (2 different from 4, 2 different from 6, 4 different from 6)
@@ -422,19 +469,21 @@
     aov_mch %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05)
     
     # plot
-    cols <- c("2" = "#D2D2D2", "4" = "#828282", "6" = "#3C3C3C", "M" = "#0072B2", "F" = "#CC79A7")
+    cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
     
     df_mice %>% 
       ggplot(aes(x = treatment, y = MCH..pg.)) +
-      geom_violin(aes(color = timepoint..month.)) +
+      geom_violin(aes(color = treatment)) +
+      facet_wrap(~timepoint..month.) +
       # geom_boxplot(aes(color = treatment), width = .3, position = position_dodge(0.9), outlier.shape = NA, alpha = 0.1) +
       stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint..month.), position = position_dodge(), size = .3, lty = 2) +
       
       geom_sina(aes(fill = timepoint..month., color = sex), size = 2.5, shape = 1) +
-      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .3) +
+      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .2) +
       
       scale_color_manual(values = cols) +
-      theme_bw()
+      theme_bw() +
+      theme(legend.position = "none")
     
     # conclusions:
     #   timepoint effect (2 different from 4, 2 different from 6)
@@ -454,19 +503,21 @@
     aov_mchc %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05)
     
     # plot
-    cols <- c("2" = "#D2D2D2", "4" = "#828282", "6" = "#3C3C3C", "M" = "#0072B2", "F" = "#CC79A7")
+    cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
     
     df_mice %>% 
       ggplot(aes(x = treatment, y = MCHC..g.dL.)) +
-      geom_violin(aes(color = timepoint..month.)) +
+      geom_violin(aes(color = treatment)) +
+      facet_wrap(~timepoint..month.) +
       # geom_boxplot(aes(color = treatment), width = .3, position = position_dodge(0.9), outlier.shape = NA, alpha = 0.1) +
       stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint..month.), position = position_dodge(), size = .3, lty = 2) +
       
       geom_sina(aes(fill = timepoint..month., color = sex), size = 2.5, shape = 1) +
-      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .3) +
+      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .2) +
       
       scale_color_manual(values = cols) +
-      theme_bw()
+      theme_bw() +
+      theme(legend.position = "none")
     
     # conclusions:
     #   timepoint effect (6 different from 2, 6 different from 4)
@@ -484,22 +535,24 @@
 
     aov_mchc_o <- aov(MCHC.O..g.dL. ~ timepoint..month.*treatment*sex, data = df_mice)
     aov_mchc_o %>% tidy() %>% filter(p.value < 0.05)
-    aov_mchc_o %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05)
+    aov_mchc_o %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05) %>% print(n = nrow(.))
     
     # plot
-    cols <- c("2" = "#D2D2D2", "4" = "#828282", "6" = "#3C3C3C", "M" = "#0072B2", "F" = "#CC79A7")
+    cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
     
     df_mice %>% 
       ggplot(aes(x = treatment, y = MCHC.O..g.dL.)) +
-      geom_violin(aes(color = timepoint..month.)) +
+      geom_violin(aes(color = treatment)) +
+      facet_wrap(~timepoint..month.) +
       # geom_boxplot(aes(color = treatment), width = .3, position = position_dodge(0.9), outlier.shape = NA, alpha = 0.1) +
       stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint..month.), position = position_dodge(), size = .3, lty = 2) +
       
       geom_sina(aes(fill = timepoint..month., color = sex), size = 2.5, shape = 1) +
-      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .3) +
+      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .2) +
       
       scale_color_manual(values = cols) +
-      theme_bw()
+      theme_bw() +
+      theme(legend.position = "none")
     
     # conclusions:
     #   timepoint effect (6 different from 2, 6 different from 4)
@@ -521,19 +574,21 @@
     aov_rdw %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05)
     
     # plot
-    cols <- c("2" = "#D2D2D2", "4" = "#828282", "6" = "#3C3C3C", "M" = "#0072B2", "F" = "#CC79A7")
+    cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
     
     df_mice %>% 
       ggplot(aes(x = treatment, y = RDW....)) +
-      geom_violin(aes(color = timepoint..month.)) +
+      geom_violin(aes(color = treatment)) +
+      facet_wrap(~timepoint..month.) +
       # geom_boxplot(aes(color = treatment), width = .3, position = position_dodge(0.9), outlier.shape = NA, alpha = 0.1) +
       stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint..month.), position = position_dodge(), size = .3, lty = 2) +
       
       geom_sina(aes(fill = timepoint..month., color = sex), size = 2.5, shape = 1) +
-      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .3) +
+      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .2) +
       
       scale_color_manual(values = cols) +
-      theme_bw()
+      theme_bw() +
+      theme(legend.position = "none")
     
     # conclusions:
     #   treatment-sex interaction
@@ -550,19 +605,21 @@
     aov_ret %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05)
     
     # plot
-    cols <- c("2" = "#D2D2D2", "4" = "#828282", "6" = "#3C3C3C", "M" = "#0072B2", "F" = "#CC79A7")
+    cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
     
     df_mice %>% 
       ggplot(aes(x = treatment, y = Ret.He..pg.)) +
-      geom_violin(aes(color = timepoint..month.)) +
+      geom_violin(aes(color = treatment)) +
+      facet_wrap(~timepoint..month.) +
       # geom_boxplot(aes(color = treatment), width = .3, position = position_dodge(0.9), outlier.shape = NA, alpha = 0.1) +
       stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint..month.), position = position_dodge(), size = .3, lty = 2) +
       
       geom_sina(aes(fill = timepoint..month., color = sex), size = 2.5, shape = 1) +
-      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .3) +
+      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .2) +
       
       scale_color_manual(values = cols) +
-      theme_bw()
+      theme_bw() +
+      theme(legend.position = "none")
     
     # conclusions:
     #   sex effect
@@ -581,19 +638,21 @@
     aov_arc %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05)
     
     # plot
-    cols <- c("2" = "#D2D2D2", "4" = "#828282", "6" = "#3C3C3C", "M" = "#0072B2", "F" = "#CC79A7")
+    cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
     
     df_mice %>% 
       ggplot(aes(x = treatment, y = ARC..10.6.uL.)) +
-      geom_violin(aes(color = timepoint..month.)) +
+      geom_violin(aes(color = treatment)) +
+      facet_wrap(~timepoint..month.) +
       # geom_boxplot(aes(color = treatment), width = .3, position = position_dodge(0.9), outlier.shape = NA, alpha = 0.1) +
       stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint..month.), position = position_dodge(), size = .3, lty = 2) +
       
       geom_sina(aes(fill = timepoint..month., color = sex), size = 2.5, shape = 1) +
-      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .3) +
+      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .2) +
       
       scale_color_manual(values = cols) +
-      theme_bw()
+      theme_bw() +
+      theme(legend.position = "none")
     
     # conclusions:
     #   timepoint effect (6 different from 2)
@@ -609,19 +668,21 @@
     aov_ret_he %>% TukeyHSD() %>% tidy() %>% filter(adj.p.value < 0.05)
     
     # plot
-    cols <- c("2" = "#D2D2D2", "4" = "#828282", "6" = "#3C3C3C", "M" = "#0072B2", "F" = "#CC79A7")
+    cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
     
     df_mice %>% 
       ggplot(aes(x = treatment, y = Ret.He..pg.)) +
-      geom_violin(aes(color = timepoint..month.)) +
+      geom_violin(aes(color = treatment)) +
+      facet_wrap(~timepoint..month.) +
       # geom_boxplot(aes(color = treatment), width = .3, position = position_dodge(0.9), outlier.shape = NA, alpha = 0.1) +
       stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint..month.), position = position_dodge(), size = .3, lty = 2) +
       
       geom_sina(aes(fill = timepoint..month., color = sex), size = 2.5, shape = 1) +
-      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .3) +
+      stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .2) +
       
       scale_color_manual(values = cols) +
-      theme_bw()
+      theme_bw() +
+      theme(legend.position = "none")
     
     # conclusions:
     #   sex effect
@@ -642,8 +703,7 @@
       dplyr::filter(!is.na(hepatic.necrosis..yes.no.))
     
     # regression
-    model.matrix(~timepoint..month. + treatment + sex, data = df_hep_nec)
-    glm(hepatic.necrosis..yes.no. ~ ., data = df_hep_nec, family = "binomial") %>% 
+    glm(hepatic.necrosis..yes.no. ~ timepoint..month. + treatment + sex, data = df_hep_nec, family = "binomial") %>% 
       summary() %>% 
       .$coefficients %>% 
       as_tibble(rownames = "term") %>% 
@@ -651,12 +711,12 @@
     
     # plot
     df_hep_nec %>% 
-      count(treatment, timepoint..month., hepatic.necrosis..yes.no.) %>% 
+      # count(treatment, timepoint..month., sex, hepatic.necrosis..yes.no.) %>% 
       filter(!is.na(hepatic.necrosis..yes.no.)) %>% 
       
-      ggplot(aes(x = treatment, y = n)) +
-      geom_col(aes(fill = hepatic.necrosis..yes.no.), position = "dodge") +
-      # facet_wrap(~timepoint..month.) +
+      ggplot(aes(x = treatment, y = hepatic.necrosis..yes.no., color = hepatic.necrosis..yes.no.)) +
+      geom_point(position = position_jitter(0.2)) +
+      facet_grid(sex ~ timepoint..month.) +
       
       theme_bw()
     
@@ -675,36 +735,73 @@
           dplyr::select(c(timepoint..month., treatment, sex, iron.deposition.score..0.4...spleen.)) %>% 
           dplyr::filter(!is.na(iron.deposition.score..0.4...spleen.))
     
-        # regression
-        model.matrix(~timepoint..month. + treatment + sex, data = df_spleen)
-        glm(iron.deposition.score..0.4...spleen. ~ ., data = df_spleen) %>% 
-          summary() %>% 
-          .$coefficients %>% 
-          as_tibble(rownames = "term") %>% 
-          mutate(odds_ratio = exp(Estimate))
-        
+        # regression (select model with lowest AIC)
+        model_spleen <- polr(iron.deposition.score..0.4...spleen. ~ timepoint..month.*sex + treatment, data = df_spleen, Hess = TRUE, method = "probit")
+        coef_spleen <- model_spleen %>% summary() %>% coef() %>% as_tibble(rownames = "term")
+        coef_spleen %>% mutate(p.val = pnorm(abs(coef_spleen$`t value`), lower.tail = FALSE)*2, OR = exp(Value))
+
         # plot
-        df_spleen %>% 
-          count(treatment, timepoint..month., iron.deposition.score..0.4...spleen.) %>% 
-          filter(!is.na(iron.deposition.score..0.4...spleen.)) %>% 
-          
-          ggplot(aes(x = treatment, y = n)) +
-          geom_col(aes(fill = iron.deposition.score..0.4...spleen.), position = "dodge") +
-          # facet_wrap(~timepoint..month.) +
-          
-          theme_bw()
-        
+        df_spleen %>% ggplot(aes(x = treatment, y = iron.deposition.score..0.4...spleen., color = iron.deposition.score..0.4...spleen.)) +
+          geom_point(position = position_jitter(0.2)) +
+          facet_grid(sex ~ timepoint..month., margins = TRUE) +
+          theme_bw() +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))          
     
     # liver
+        
+        # select variables of interest
+        df_liver <- df_mice %>% 
+          dplyr::select(c(timepoint..month., treatment, sex, iron.deposition.score..0.4...liver.)) %>% 
+          dplyr::filter(!is.na(iron.deposition.score..0.4...liver.))
+        
+        # regression (select model with lowest AIC)
+        model_liver <- polr(iron.deposition.score..0.4...liver. ~ timepoint..month.*sex + treatment, data = df_liver, Hess = TRUE, method = "probit")
+        coef_liver <- model_liver %>% summary() %>% coef() %>% as_tibble(rownames = "term")
+        coef_liver %>% mutate(p.val = pnorm(abs(coef_liver$`t value`), lower.tail = FALSE)*2, OR = exp(Value))
+        
+        polr(iron.deposition.score..0.4...liver. ~ timepoint..month.*sex*treatment, data = df_liver, Hess = TRUE, method = "probit")
+        polr(iron.deposition.score..0.4...liver. ~ timepoint..month. + sex + treatment, data = df_liver, Hess = TRUE, method = "probit")
+        polr(iron.deposition.score..0.4...liver. ~ timepoint..month.*sex + treatment, data = df_liver, Hess = TRUE, method = "probit")
+        polr(iron.deposition.score..0.4...liver. ~ timepoint..month.*treatment + sex, data = df_liver, Hess = TRUE, method = "probit")
+        
+        
+        # plot
+        df_liver %>% ggplot(aes(x = treatment, y = iron.deposition.score..0.4...liver., color = iron.deposition.score..0.4...liver.)) +
+          geom_point(position = position_jitter(0.2)) +
+          facet_grid(sex ~ timepoint..month., margins = TRUE) +
+          theme_bw() +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))          
+        
     
     # kidney
+        
+        # select variables of interest
+        df_kidney <- df_mice %>% 
+          dplyr::select(c(timepoint..month., treatment, sex, iron.deposition.score..0.4..kidney.)) %>% 
+          dplyr::filter(!is.na(iron.deposition.score..0.4..kidney.))
+        
+        # regression (select model with lowest AIC)
+        model_kidney <- polr(iron.deposition.score..0.4..kidney. ~ timepoint..month. + treatment + sex, data = df_kidney, Hess = TRUE, method = "probit")
+        coef_kidney <- model_kidney %>% summary() %>% coef() %>% as_tibble(rownames = "term")
+        coef_kidney %>% mutate(p.val = pnorm(abs(coef_kidney$`t value`), lower.tail = FALSE)*2, OR = exp(Value))
+        
+        # plot
+        df_kidney %>% ggplot(aes(x = treatment, y = iron.deposition.score..0.4..kidney., color = iron.deposition.score..0.4..kidney.)) +
+          geom_point(position = position_jitter(0.2)) +
+          facet_grid(sex ~ timepoint..month., margins = TRUE) +
+          theme_bw() +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))          
+        
     
-    
-    
-    
-    
-    
-    
+        polr(iron.deposition.score..0.4..kidney. ~ timepoint..month.*sex*treatment, data = df_kidney, Hess = TRUE, method = "probit")
+        polr(iron.deposition.score..0.4..kidney. ~ timepoint..month.*sex + treatment, data = df_kidney, Hess = TRUE, method = "probit")
+        polr(iron.deposition.score..0.4..kidney. ~ timepoint..month. + sex*treatment, data = df_kidney, Hess = TRUE, method = "probit")
+        polr(iron.deposition.score..0.4..kidney. ~ timepoint..month.*treatment + sex, data = df_kidney, Hess = TRUE, method = "probit")
+        polr(iron.deposition.score..0.4..kidney. ~ timepoint..month. + treatment + sex, data = df_kidney, Hess = TRUE, method = "probit")
+        polr(iron.deposition.score..0.4..kidney. ~ timepoint..month. + treatment, data = df_kidney, Hess = TRUE, method = "probit")
+        polr(iron.deposition.score..0.4..kidney. ~ timepoint..month. + sex, data = df_kidney, Hess = TRUE, method = "probit")
+        polr(iron.deposition.score..0.4..kidney. ~ treatment + sex, data = df_kidney, Hess = TRUE, method = "probit")
+        
     
                                                        
     
