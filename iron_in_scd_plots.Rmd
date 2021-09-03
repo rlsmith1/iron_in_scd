@@ -1,0 +1,58 @@
+---
+title: "Iron in SCD"
+author: "Rachel Smith"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+library(tidyverse)
+library(ggforce)
+
+```
+
+```{r data}
+
+# import
+df_mice <- read.csv("data/Majed's mice.csv") %>% 
+  as_tibble() %>% 
+  dplyr::select(-c(X, X.1, X.2)) %>% 
+  filter(!is.na(Mouse.ID))
+
+# format
+df_mice <- df_mice %>% 
+  mutate_if(is.character, factor) %>% 
+  mutate_if(is.integer, factor)
+
+```
+
+```{r plot, fig.width = 15, fig.height = 50}
+
+cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
+
+df_mice %>% 
+  dplyr::select(-c(hepatic.necrosis..yes.no., iron.deposition.score..0.4...spleen., iron.deposition.score..0.4...liver., iron.deposition.score..0.4..kidney.)) %>% 
+  pivot_longer(cols = 5:ncol(.), names_to = "variable", values_to = "value") %>% 
+  
+  ggplot(aes(x = treatment, y = value)) +
+  geom_violin(aes(color = treatment)) +
+  facet_grid(variable ~ timepoint..month., scales = "free_y") +
+  # geom_boxplot(aes(color = treatment), width = .3, position = position_dodge(0.9), outlier.shape = NA, alpha = 0.1) +
+  stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint..month.), position = position_dodge(), size = .3, lty = 2) +
+  
+  geom_sina(aes(fill = timepoint..month., color = sex), size = 2.5, shape = 1) +
+  stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint..month., color = sex), position = position_dodge(), size = .2) +
+  
+  labs(y = "") +
+  scale_color_manual(values = cols) +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.title.x = element_text(size = 20),
+        axis.text = element_text(size = 17),
+        strip.text = element_text(size = 15))
+
+```
+
