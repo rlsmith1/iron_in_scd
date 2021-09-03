@@ -1,7 +1,4 @@
 ---
-title: "Iron in SCD"
-author: "Rachel Smith"
-date: "`r Sys.Date()`"
 output: html_document
 ---
 
@@ -29,7 +26,7 @@ df_mice <- df_mice %>%
 
 ```
 
-```{r plot, fig.width = 15, fig.height = 50}
+```{r plot, fig.width = 15, fig.height = 49.5}
 
 cols <- c("2" = "#828282", "4" = "#828282", "6" = "#828282", "M" = "#0072B2", "F" = "#CC79A7")
 
