@@ -66,7 +66,7 @@
     
     # correlations
    
-        df_correlate <- df_mice %>% dplyr::select(-c(1:4))
+        df_correlate <- df_mice %>% dplyr::select(-c(1:4, 24)) 
         mice_cor <- df_correlate %>% correlate(method = "spearman", diagonal = NA)
         
         # plot
