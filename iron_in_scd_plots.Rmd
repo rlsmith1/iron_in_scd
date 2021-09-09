@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 library(tidyverse)
 library(ggforce)
 library(corrr)
+library(forcats)
 
 ```
 
@@ -47,7 +48,7 @@ df_mice <- df_mice %>%
     "MCHC (g/dL)" = "MCHC..g.dL.",
     "MCHC-O (g/dL)" = "MCHC.O..g.dL.",
     "RDW (%)" = "RDW....",
-    "RET" = "RET.",
+    "RET (%)" = "RET.",
     "ARC 10^6 (µL)" = "ARC..10.6.uL.",
     "Ret-He (pg)" = "Ret.He..pg.",
     "Hepatic necrosis" = "hepatic.necrosis..yes.no.",
@@ -59,24 +60,98 @@ df_mice <- df_mice %>%
   
   mutate(treatment = ifelse(treatment == "sufficient", "Sufficient", "Deficient")
     
-  )
+  ) 
 
 ```
 
-#### Correlations
-```{r plot1, fig.width = 8, fig.height = 8}
-df_correlate <- df_mice %>% dplyr::select(-c(1:4, 24))
-mice_cor <- df_correlate %>% correlate(method = "spearman", diagonal = NA)
+#### Spearman correlations
+```{r plot1a, fig.width = 10, fig.height = 10}
+
+# correlate sufficient
+df_correlate_sufficient <- df_mice %>% dplyr::filter(treatment == "Sufficient") %>% dplyr::select(-c(1:4, 24)) 
+mice_cor_sufficient <- df_correlate_sufficient %>% correlate(method = "spearman", diagonal = NA)
+
+# test for significance
+
+f_spearmantt <- function(r, n) {r*sqrt((n-2)/(1-r^2))}
+n <- nrow(df_mice)
+
+mice_cor_long_sufficient <- mice_cor_sufficient %>% 
+  stretch() %>% 
+  mutate(x = factor(x, levels = colnames(df_correlate_sufficient)),
+         y = factor(y, levels = colnames(df_correlate_sufficient))) 
+
+df_cor_suf <- mice_cor_long_sufficient %>% 
+  mutate(t = f_spearmantt(abs(r), n)) %>% 
+  mutate(p.val = 1 - pt(t, n - 1)) %>% 
+  mutate(p.adj = p.adjust(p.val, method = "BH")) %>% 
+  mutate(significant = factor(ifelse(p.adj < 0.05, 1, 0))) %>% 
+  mutate(r_label = ifelse(is.na(r), "", sub("^(-?)0.", "\\1.", sprintf("%.2f", round(r, 2)))))
 
 # plot
-rplot(mice_cor, colors = c("deepskyblue1", "white", "coral"), print_cor = TRUE) +
+ggplot(data = df_cor_suf, aes(x = x, y = y)) +
+  geom_point(data = df_cor_suf, aes(color = r, fill = r, size = abs(r), alpha = abs(r))) +
+  geom_text(data = df_cor_suf, aes(label = r_label, alpha = abs(r)), size = 3) +
+  
+  geom_point(data = df_cor_suf %>% filter(significant == "1"), aes(size = abs(r), alpha = abs(r)), shape = 1, stroke = 1) +
+  
+  scale_alpha(guide = "none") +
+  scale_size(guide = "none") +
+  scale_color_gradient2(low = "deepskyblue1", mid = "white", high = "coral") + 
+  scale_fill_gradient2(low = "deepskyblue1", mid = "white", high = "coral") + 
+  
+  labs(x = NULL, y = NULL) +
+  theme_classic() +
   theme(axis.text.x = element_text(angle = 45, hjust = 0.9))
+
+
+```
+
+```{r plot1b, fig.width = 10, fig.height = 10}
+
+# correlate deficient
+df_correlate_deficient <- df_mice %>% dplyr::filter(treatment == "Deficient") %>% dplyr::select(-c(1:4, 24)) 
+mice_cor_deficient <- df_correlate_deficient %>% correlate(method = "spearman", diagonal = NA)
+
+# test for significance
+mice_cor_long_deficient <- mice_cor_deficient %>% 
+  stretch() %>% 
+  mutate(x = factor(x, levels = colnames(df_correlate_deficient)),
+         y = factor(y, levels = colnames(df_correlate_deficient))) 
+
+df_cor_def <- mice_cor_long_deficient %>% 
+  mutate(t = f_spearmantt(abs(r), n)) %>% 
+  mutate(p.val = 1 - pt(t, n - 1)) %>% 
+  mutate(p.adj = p.adjust(p.val, method = "BH")) %>% 
+  mutate(significant = factor(ifelse(p.adj < 0.05, 1, 0))) %>% 
+  mutate(r_label = ifelse(is.na(r), "", sub("^(-?)0.", "\\1.", sprintf("%.2f", round(r, 2)))))
+
+# plot
+ggplot(data = df_cor_def, aes(x = x, y = y)) +
+  geom_point(data = df_cor_def, aes(color = r, fill = r, size = abs(r), alpha = abs(r))) +
+  geom_text(data = df_cor_def, aes(label = r_label, alpha = abs(r)), size = 3) +
+  
+  geom_point(data = df_cor_def %>% filter(significant == "1"), aes(size = abs(r), alpha = abs(r)), shape = 1, stroke = 1) +
+  
+  scale_alpha(guide = "none") +
+  scale_size(guide = "none") +
+  scale_color_gradient2(low = "deepskyblue1", mid = "white", high = "coral") + 
+  scale_fill_gradient2(low = "deepskyblue1", mid = "white", high = "coral") + 
+  
+  labs(x = NULL, y = NULL) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 0.9))
+
+d <- df_mice %>% dplyr::select(c(timepoint, treatment, `P50 (mm/Hg)`, `Spleen IDS`, `Kidney IDS`)) %>% 
+  filter(!is.na(`P50 (mm/Hg)`), !is.na(`Spleen IDS`), !is.na(`Kidney IDS`), treatment == "Deficient")
+
+
 ```
 
 #### Comparisons
 ```{r plot2, fig.width = 15, fig.height = 49.5}
 
-cols <- c("2" = "#505050", "4" = "#505050", "6" = "#505050", "M" = "#F8766D", "F" = "#00BFC4")
+cols <- c("M" = "#F8766D", "F" = "#00BFC4")
 
 df_mice %>% 
   dplyr::select(-c(`Hepatic necrosis`, `Spleen IDS`, `Liver IDS`, `Kidney IDS`)) %>% 
@@ -85,14 +160,14 @@ df_mice %>%
   
   ggplot(aes(x = treatment, y = value)) +
   geom_point(aes(color = sex), position = position_dodge(0.5), size = 3, shape = 1) +
-  stat_summary(fun = "median", geom = "crossbar", aes(color = timepoint), position = position_dodge(), size = .3) +
-  stat_summary(fun = "median", geom = "crossbar", aes(fill = timepoint, color = sex), position = position_dodge(), size = .2, lty = 2) +
+  stat_summary(fun = "median", geom = "crossbar", position = position_dodge(), size = .3, show_guide = FALSE) +
+  stat_summary(fun = "median", geom = "crossbar", aes(color = sex), position = position_dodge(), size = .2, lty = 2, show_guide = FALSE) +
   
   facet_grid(variable ~ timepoint, scales = "free_y") +
   labs(y = "") +
   scale_color_manual(values = cols) +
   theme_bw() +
-  theme(legend.position = "none",
+  theme(legend.position = "top",
         axis.title.x = element_text(size = 20),
         axis.text = element_text(size = 17),
         strip.text = element_text(size = 15))

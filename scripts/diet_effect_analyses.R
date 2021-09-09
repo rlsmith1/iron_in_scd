@@ -972,7 +972,7 @@
             aov_liver %>% tidy() %>% mutate(variable = "liver"),
             aov_kidney %>% tidy() %>% mutate(variable = "kidney")
             
-          )  
+          )  %>% dplyr::select(c(variable, everything())) 
           
           df_all_models_sig_rs <- df_all_model_rs %>% 
             dplyr::filter(!is.na(p.value)) %>% 
@@ -1000,102 +1000,146 @@
           
           # ferritin
           df_all_models_sig_rs %>% filter(variable == "ferritin")
-          f_tukey_rs(aov_ferritin, "ferritin")
+          tukey_ferritin <- f_tukey_rs(aov_ferritin, "ferritin")
           
           # hamp1
           df_all_models_sig_rs %>% filter(variable == "hamp1")
-          f_tukey_rs(aov_hamp1, "hamp1")
+          tukey_hamp1 <- f_tukey_rs(aov_hamp1, "hamp1")
           
           # hepcidin
           df_all_models_sig_rs %>% filter(variable == "hepcidin")
-          f_tukey_rs(aov_hepcidin, "hepcidin")
+          tukey_hepcidin <- f_tukey_rs(aov_hepcidin, "hepcidin")
           
           # plasma heme
           df_all_models_sig_rs %>% filter(variable == "plasma_heme")
-          f_tukey_rs(aov_plasma_heme, "plasma_heme")
+          tukey_plasma_heme <- f_tukey_rs(aov_plasma_heme, "plasma_heme")
           
           # haptoglobin
           df_all_models_sig_rs %>% filter(variable == "haptoglobin")
-          f_tukey_rs(aov_haptoglobin, "haptoglobin")
+          tukey_haptoglobin <- f_tukey_rs(aov_haptoglobin, "haptoglobin")
           
           # hemopexin
           df_all_models_sig_rs %>% filter(variable == "hemopexin")
-          f_tukey_rs(aov_hemopexin, "hemopexin")
+          tukey_hemopexin <- f_tukey_rs(aov_hemopexin, "hemopexin")
           
           # p50
           df_all_models_sig_rs %>% filter(variable == "p50")
-          f_tukey_rs(aov_p50, "p50")
+          tukey_p50 <- f_tukey_rs(aov_p50, "p50")
           
           # round_cell
           df_all_models_sig_rs %>% filter(variable == "round_cell")
-          f_tukey_rs(aov_round_cell, "round_cell")
+          tukey_round_cell <- f_tukey_rs(aov_round_cell, "round_cell")
 
           # RBC count
           df_all_models_sig_rs %>% filter(variable == "rbc")
-          f_tukey_rs(aov_rbc, "rbc")
+          tukey_rbc <- f_tukey_rs(aov_rbc, "rbc")
 
           # Hb
           df_all_models_sig_rs %>% filter(variable == "Hb")
-          f_tukey_rs(aov_hb, "Hb")
+          tukey_hb <- f_tukey_rs(aov_hb, "Hb")
           
           # hct          
           df_all_models_sig_rs %>% filter(variable == "hct")
-          f_tukey_rs(aov_hct, "hct")
+          tukey_hct <- f_tukey_rs(aov_hct, "hct")
           
           # mcv
           df_all_models_sig_rs %>% filter(variable == "mcv")
-          f_tukey_rs(aov_mcv, "mcv")
+          tukey_mcv <- f_tukey_rs(aov_mcv, "mcv")
           
           # mch
           df_all_models_sig_rs %>% filter(variable == "mch")
-          f_tukey_rs(aov_mch, "mch")
+          tukey_mch <- f_tukey_rs(aov_mch, "mch")
           
           # mchc
           df_all_models_sig_rs %>% filter(variable == "mchc")
-          f_tukey_rs(aov_mchc, "mchc")
+          tukey_mchc <- f_tukey_rs(aov_mchc, "mchc")
           
           # mchc-o
           df_all_models_sig_rs %>% filter(variable == "mchc_o")
-          f_tukey_rs(aov_mchc_o, "mchc_o")
+          tukey_mchc_o <- f_tukey_rs(aov_mchc_o, "mchc_o")
           
           # rdw
           df_all_models_sig_rs %>% filter(variable == "rdw")
-          f_tukey_rs(aov_rdw, "rdw")
+          tukey_rdw <- f_tukey_rs(aov_rdw, "rdw")
           
           # ret
           df_all_models_sig_rs %>% filter(variable == "ret")
-          f_tukey_rs(aov_ret, "ret")
+          tukey_ret <- f_tukey_rs(aov_ret, "ret")
           
           # arc
           df_all_models_sig_rs %>% filter(variable == "arc")
-          f_tukey_rs(aov_arc, "arc")
+          tukey_arc <- f_tukey_rs(aov_arc, "arc")
           
           # ret-he
           df_all_models_sig_rs %>% filter(variable == "ret_he")
-          f_tukey_rs(aov_ret_he, "ret_he")
+          tukey_ret_he <- f_tukey_rs(aov_ret_he, "ret_he")
           
           # spleen
           df_all_models_sig_rs %>% filter(variable == "spleen")
-          f_tukey_rs(aov_spleen, "spleen")
+          tukey_spleen <- f_tukey_rs(aov_spleen, "spleen")
           
           # liver
           df_all_models_sig_rs %>% filter(variable == "liver")
-          f_tukey_rs(aov_liver, "liver")
+          tukey_liver <- f_tukey_rs(aov_liver, "liver")
           
           # kidney
           df_all_models_sig_rs %>% filter(variable == "kidney")
-          f_tukey_rs(aov_kidney, "kidney")
+          tukey_kidney <- f_tukey_rs(aov_kidney, "kidney")
           
           
           
+
+# export to csv -----------------------------------------------------------
+
+
+          # combine all tukey results
+          df_all_tukey_rs <- bind_rows(
+            
+            tukey_ferritin%>% mutate(variable = "ferritin"),
+            tukey_hamp1 %>% mutate(variable = "hamp1"),
+            tukey_hepcidin%>% mutate(variable = "hepcidin"),
+            tukey_plasma_heme %>% mutate(variable = "plasma_heme"),
+            tukey_haptoglobin %>% mutate(variable = "haptoglobin"),
+            tukey_hemopexin %>% mutate(variable = "hemopexin"),
+            tukey_p50 %>% mutate(variable = "p50"),
+            tukey_round_cell %>% mutate(variable = "round_cell"),
+            tukey_rbc %>% mutate(variable = "rbc"),
+            tukey_hb %>% mutate(variable = "Hb"),
+            tukey_hct %>% mutate(variable = "hct"),
+            tukey_mcv %>% mutate(variable = "mcv"),
+            tukey_mch %>% mutate(variable = "mch"),
+            tukey_mchc %>% mutate(variable = "mchc"),
+            tukey_mchc_o %>% mutate(variable = "mchc_o"),
+            tukey_rdw %>% mutate(variable = "rdw"),
+            tukey_ret %>% mutate(variable = "ret"),
+            tukey_arc %>% mutate(variable = "arc"),
+            tukey_ret_he %>% mutate(variable = "ret_he"),
+            tukey_spleen %>% mutate(variable = "spleen"),
+            tukey_liver %>% mutate(variable = "liver"),
+            tukey_kidney %>% mutate(variable = "kidney")
+            
+          )  %>% dplyr::select(c(variable, everything()))
+          
+
+          # combine with overall model rs
+          df_all_rs <- df_all_models_sig_rs %>% 
+            left_join(df_all_tukey_rs, by = c("variable", "term")) %>% 
+            dplyr::filter(!is.na(adj.p.value)) %>% 
+            dplyr::rename("t.statistic" = "statistic", "tukey.p.adj" = "adj.p.value", "coefficient" = "estimate") %>% 
+            
+            # adjust scientific notation
+            mutate_at(c(7:8, 14), ~ifelse(.x < .01, 
+                                          sub("-0?", "-", 
+                                              sub("\\+0?", "", 
+                                                  sub("e", "*10^", 
+                                                      scientific(.x, digits = 3)))), 
+                                          round(.x, 4)))
+          
+          # export
+          df_all_rs %>% write.csv(file = "outputs/iron_in_scd_mv_results.csv")
           
           
-          
-          
-          
-          
-          
-          
+
           
           
           
